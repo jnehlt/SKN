@@ -44,9 +44,9 @@ int get_strings (char** ptr_str_1, char** ptr_str_2)
         //read error
         return -3;
     }
-    //empty string(s)
     if(**ptr_str_1 == 10 || **ptr_str_2 == 10)
     {
+        //empty string(s)
         return -1;
     }
 
