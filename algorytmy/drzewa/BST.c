@@ -9,12 +9,48 @@ struct tree_t
   int key;
 };
 
-void DODAJ(struct tree_t**, int);
-void USUN(struct tree_t**, int);
-struct tree_t* ZNAJDZ(const struct tree_t**, int);
-struct tree_t* NASTEPNIK(const struct tree_t**, int);
+void add(struct tree_t**, int);
+void delete(struct tree_t**, int);
+struct tree_t* find(struct tree_t*, int);
+void succesor(struct tree_t*);
+void print(struct tree_t*);
+struct tree_t* min(struct tree_t*);
+struct tree_t* max(struct tree_t*);
+void inorder(struct tree_t*);
+void preorder(struct tree_t*);
+void postorder(struct tree_t*);
 
-void DODAJ(struct tree_t** tree, int key)
+
+int main(void)
+{
+  struct tree_t* tree = NULL;
+  add(&tree, 20);
+  add(&tree, 5);
+  add(&tree, 25);
+  add(&tree, 35);
+  add(&tree, 15);
+  add(&tree, 18);
+  add(&tree, 29);
+  add(&tree, 50);
+  add(&tree, 44);
+  add(&tree, 39);
+  add(&tree, 13);
+
+  inorder(tree);
+  printf("\n");
+
+  preorder(tree);
+  printf("\n");
+
+  postorder(tree);
+  printf("\n");
+
+  succesor(tree->right->right->left);
+
+  return 0;
+}
+
+void add(struct tree_t** tree, int key)
 {
   struct tree_t* var = NULL;
   struct tree_t* temp = *tree;
@@ -58,7 +94,7 @@ void DODAJ(struct tree_t** tree, int key)
   }
 }
 
-struct tree_t* ZNAJDZ(const struct tree_t* tree, int key)
+struct tree_t* find(struct tree_t* tree, int key)
 {
   struct tree_t* temp = tree;
   while(temp != NULL)
@@ -80,7 +116,7 @@ struct tree_t* ZNAJDZ(const struct tree_t* tree, int key)
   return NULL;
 }
 
-struct tree_t* NASTEPNIK(const struct tree_t* tree, int key)
+void succesor(struct tree_t* tree)
 {
   struct tree_t* temp = tree;
   if (temp->right)
@@ -91,21 +127,112 @@ struct tree_t* NASTEPNIK(const struct tree_t* tree, int key)
       temp = temp->left;
     }
   }
-  else if (temp->parent)
+  else if (temp->parent->left == temp)
   {
     temp = temp->parent;
   }
+  else if(temp->parent != NULL)
+  {
+    while(temp != temp->parent->left)
+    {
+      temp = temp->parent;
+    }
+  }
 
-  return temp;
+  printf(" %d\n", temp->key);
+  return;
 }
 
-void USUN(struct tree_t** tree, int key)
+void inorder(struct tree_t* root)
+{
+  struct tree_t* tree = root;
+  if(tree->left)
+  {
+    inorder(tree->left);
+  }
+  printf("%d  ", tree->key);
+  if(root->right)
+  {
+    inorder(tree->right);
+  }
+}
+
+void preorder(struct tree_t* root)
+{
+  struct tree_t* tree = root;
+  printf("%d  ", tree->key);
+  if(tree->left)
+  {
+    preorder(tree->left);
+  }
+  if(tree->right)
+  {
+    preorder(tree->right);
+  }
+}
+
+void postorder(struct tree_t* root)
+{
+  struct tree_t* tree = root;
+  if(tree->left)
+  {
+    postorder(tree->left);
+  }
+  if(tree->right)
+  {
+    postorder(tree->right);
+  }
+  printf("%d  ", tree->key);
+}
+
+void print(struct tree_t* tree)
+{
+  struct tree_t* temp = tree;
+  printf("adres = %p, parent = %p, left son = %p, right son = %p, key = %d\n",
+          tree, tree->parent, tree->left, tree->right, tree->key);
+  if(tree->left == NULL && tree->right == NULL)
+  {
+    return;
+  }
+  if(tree->left)
+  {
+    tree = tree->left;
+    print(tree);
+  }
+  if(temp->right)
+  {
+    temp = temp->right;
+    print(temp);
+  }
+}
+
+struct tree_t* min(struct tree_t* tree)
+{
+  struct tree_t* min = tree;
+  while(min->left)
+  {
+    min = min->left;
+  }
+  return min;
+}
+
+struct tree_t* max(struct tree_t* tree)
+{
+  struct tree_t* max = tree;
+  while(max->right)
+  {
+    max = max->right;
+  }
+  return max;
+}
+
+void delete(struct tree_t** tree, int key)
 {
   struct tree_t* temp3; //x
   struct tree_t* temp2; //y
   struct tree_t* temp;  //z
 
-  temp = ZNAJDZ(*tree, key);
+  temp = find(*tree, key);
   if(temp == NULL)  //nie znaleziono elementu, albo drzewo jest puste
   {
     return;
@@ -124,10 +251,7 @@ void USUN(struct tree_t** tree, int key)
     }
     free(temp2);
   }
-  else
-  {
-    temp2 = NASTEPNIK(temp);
-  }
+
 
 //FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   // if (temp2->left != NULL)
@@ -138,22 +262,10 @@ void USUN(struct tree_t** tree, int key)
   // {
   //   temp3 = temp2->right;
   // }
-  // 
+  //
   // if (temp3 == NULL)
   // {
   //   temp3->parent = temp2->parent;
   // }
 //FIXME!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-}
-
-int main(void)
-{
-  struct tree_t* tree = NULL;
-  DODAJ(&tree, 20);
-  DODAJ(&tree, 5);
-  DODAJ(&tree, 25);
-  DODAJ(&tree, 35);
-  printf("parent = %p, left son = %p, right son = %p, key = %d\n", tree->parent, tree->left, tree->right, tree->key);
-
-  return 0;
 }
